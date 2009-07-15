@@ -45,6 +45,10 @@ You can also extract the stemmed word along with the rule by using the `stem_wit
   stem = stemmer.stem_with_rule('invited')   # Word('invite', Rule #22.3)
   puts stem.rule  # rule #22.3 (remove -d when the word ends in -ited)
 
+== TODO
+
+This has not been tested with POS tags yet.
+
 == Note on Patches/Pull Requests
 
 * Fork the project.
