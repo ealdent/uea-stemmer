@@ -177,5 +177,12 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal 'helpers'.stem, 'helper'
       end
     end
+
+    context "stem with rule method" do
+      should "stem a word and return a word object" do
+        assert 'helpers'.stem_with_rule.kind_of?(UEAStemmer::Word)
+        assert_equal 'helpers'.stem_with_rule.word, 'helper'
+      end
+    end
   end
 end

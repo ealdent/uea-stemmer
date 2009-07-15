@@ -27,7 +27,19 @@ class String
     self[0, size - suffix_size]
   end
 
-  def stem
+  def uea_stem
     DefaultUEAStemmer.instance.stem(self)
+  end
+
+  def stem
+    uea_stem
+  end
+
+  def uea_stem_with_rule
+    DefaultUEAStemmer.instance.stem_with_rule(self)
+  end
+
+  def stem_with_rule
+    uea_stem_with_rule
   end
 end
