@@ -21,6 +21,8 @@ Install the gem via Github:
 
 Install the gem from source:
 
+  git clone git://github.com/ealdent/uea-stemmer.git
+  cd uea-stemmer
   rake install
 
 == Example Usage
