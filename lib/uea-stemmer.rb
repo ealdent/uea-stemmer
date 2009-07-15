@@ -152,11 +152,16 @@ class UEAStemmer
     @rules << EndingRule.new('red', 1, 20)
     @rules << EndingRule.new('reds', 2, 20)
     @rules << EndingRule.new('tted', 3, 21)
-    @rules << EndingRule.new('noted', 1, 22.4)
-    @rules << EndingRule.new('leted', 1, 22.3)
+
+    # added some rules to handle invited vs. exited
+    @rules << EndingRule.new('noted', 1, 22.6)
+    @rules << EndingRule.new('leted', 1, 22.5)
+    @rules << EndingRule.new('xited', 2, 22.4)
+    @rules << EndingRule.new('ited', 1, 22.3)
     @rules << EndingRule.new('uted', 1, 22.2)
     @rules << EndingRule.new('ated', 1, 22.1)
     @rules << EndingRule.new('ted', 2, 22)
+
     @rules << EndingRule.new('anges', 1, 23)
     @rules << EndingRule.new('aining', 3, 24)
     @rules << EndingRule.new('acting', 3, 25)

@@ -32,6 +32,8 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('liked'), 'like'
         assert_equal @stemmer.stem('helped'), 'help'
         assert_equal @stemmer.stem('scarred'), 'scar'
+        assert_equal @stemmer.stem('invited'), 'invite'
+        assert_equal @stemmer.stem('exited'), 'exit'
       end
 
       should "stem progressive verbs and gerunds without the -ing" do
