@@ -88,7 +88,7 @@ class UeaStemmerTest < Test::Unit::TestCase
       assert_equal word.rule_num, 95
     end
 
-    should "reject a longer acronym with rule " do
+    should "reject a longer acronym with rule 96" do
       word = @stemmer.stem_with_rule('CAVASSOO')
       assert_equal word.rule_num, 96
     end

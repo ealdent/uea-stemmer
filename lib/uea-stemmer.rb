@@ -41,8 +41,8 @@ class UEAStemmer
       Word.new(word, 94)
     elsif word.size > @max_word_length
       Word.new(word, 95)
-    elsif word.size > @max_acronym_length && word =~ /^[A-Z]+s?/    # added by JMA
-      Word.new(word, 96)                                            # added by JMA to catch long acronyms
+    elsif (word.size > @max_acronym_length && word =~ /^[A-Z]+$/) || (word.size > (@max_acronym_length + 1) && word =~ /^[A-Z]+s$/)
+      Word.new(word, 96)      # added by JMA to catch long acronyms
     elsif word.index("'")
       if word =~ /^.*'[s]$/i
         stemmed_word = stemmed_word.remove_suffix(2)
