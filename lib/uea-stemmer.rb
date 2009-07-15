@@ -33,18 +33,17 @@ class UEAStemmer
     create_rules
   end
 
-  def decorated_stem(word)
+  def stem_with_rule(word)
     stemmed_word = word.dup;
     ruleno = 0;
 
     if problem_word?(word)
       Word.new(word, 94)
-    elsif uncountable_word?(word)
-      Word.new(word, 96)
     elsif word.size > @max_word_length
       Word.new(word, 95)
+    elsif word.size > @max_acronym_length && word =~ /^[A-Z]+s?/    # added by JMA
+      Word.new(word, 96)                                            # added by JMA to catch long acronyms
     elsif word.index("'")
-      # word has apostrophe: remove & continue with rule 94
       if word =~ /^.*'[s]$/i
         stemmed_word = stemmed_word.remove_suffix(2)
       elsif word =~ /^.*'$/
@@ -64,7 +63,7 @@ class UEAStemmer
   end
 
   def stem(word)
-    decorated_stem(word).word
+    stem_with_rule(word).word
   end
 
   def num_rules
@@ -284,8 +283,8 @@ class UEAStemmer
     @rules << ConcatenatingEndingRule.new('ating', 3, 57, 'e')
 
     # plural change - this differs from Perl v1.03
-    @rules << ConcatenatingEndingRule.new('dying', 4, 58.2, 'ie')
-    @rules << ConcatenatingEndingRule.new('tying', 4, 58.2, 'ie')
+    @rules << ConcatenatingEndingRule.new('dying', 4, 58.2, 'ie')   # added by JMA
+    @rules << ConcatenatingEndingRule.new('tying', 4, 58.2, 'ie')   # added by JMA
     @rules << EndingRule.new('thing', 0, 58.1)
     @rules << EndingRule.new('things', 1, 58.1)
     @rules << CustomRule.new(/.*\w\wings?$/, 3, 58)
@@ -314,12 +313,8 @@ class UEAStemmer
     @rules << EndingRule.new('s', 1, 68)
   end
 
-  def uncountable_word?(word)
-    ['menses'].include?(word)
-  end
-
   def problem_word?(word)
-    ['is', 'as', 'this', 'has', 'was', 'during'].include?(word)
+    ['is', 'as', 'this', 'has', 'was', 'during', 'menses'].include?(word)
   end
 
 end

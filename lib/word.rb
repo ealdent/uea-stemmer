@@ -27,5 +27,13 @@ class UEAStemmer
       @rule_num = rule_num
       @rule = rule
     end
+
+    def to_s
+      if @rule_num > 0
+        "#{@word} (Rule ##{@rule_num} #{@rule})"
+      else
+        "#{@word} (No rule)"
+      end
+    end
   end
 end

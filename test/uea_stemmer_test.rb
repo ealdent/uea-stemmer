@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class UeaStemmerTest < Test::Unit::TestCase
-  context "A Stemmer instance" do
+  context "A default UEAStemmer instance" do
     setup do
       @stemmer = UEAStemmer.new
     end
@@ -11,51 +11,124 @@ class UeaStemmerTest < Test::Unit::TestCase
       assert @stemmer.max_acronym_length == 'CAVASSOO'.size
     end
 
-    should "stem words as Strings" do
-      assert @stemmer.stem('word').is_a?(String)
+    context "stem method" do
+      should "stem words as Strings" do
+        assert @stemmer.stem('word').is_a?(String)
+      end
+
+      should "stem base words to just the base word" do
+        assert_equal @stemmer.stem('man'), 'man'
+        assert_equal @stemmer.stem('happiness'), 'happiness'
+      end
+
+      should "stem theses as thesis but not bases as basis" do
+        assert_equal @stemmer.stem('theses'), 'thesis'
+        assert_not_equal @stemmer.stem('bases'), 'basis'
+      end
+
+      should "stem preterite words ending in -ed without the -ed" do
+        assert_equal @stemmer.stem('ordained'), 'ordain'
+        assert_equal @stemmer.stem('killed'), 'kill'
+        assert_equal @stemmer.stem('liked'), 'like'
+        assert_equal @stemmer.stem('helped'), 'help'
+        assert_equal @stemmer.stem('scarred'), 'scar'
+      end
+
+      should "stem progressive verbs and gerunds without the -ing" do
+        assert_equal @stemmer.stem('running'), 'run'
+        assert_equal @stemmer.stem('settings'), 'set'
+        assert_equal @stemmer.stem('timing'), 'time'
+        assert_equal @stemmer.stem('dying'), 'die'
+        assert_equal @stemmer.stem('harping'), 'harp'
+        assert_equal @stemmer.stem('charring'), 'char'
+      end
+
+      should "stem various plural nouns and 3rd-pres verbs without the -s/-es" do
+        assert_equal @stemmer.stem('changes'), 'change'
+        assert_equal @stemmer.stem('deaths'), 'death'
+        assert_equal @stemmer.stem('shadows'), 'shadow'
+        assert_equal @stemmer.stem('flies'), 'fly'
+        assert_equal @stemmer.stem('things'), 'thing'
+        assert_equal @stemmer.stem('nothings'), 'nothing'   # as in 'sweet nothings'
+        assert_equal @stemmer.stem('witches'), 'witch'
+      end
     end
 
-    should "stem words as Words in decorated mode" do
-      assert @stemmer.decorated_stem('word').is_a?(UEAStemmer::Word)
+    context "stem_with_rule method" do
+      should "return a Word instance" do
+        assert @stemmer.stem_with_rule('witches').is_a?(UEAStemmer::Word)
+      end
+
+      should "return a rule and the stemmed form" do
+        word = @stemmer.stem_with_rule('witches')
+        assert !word.rule.nil?
+        assert !word.word.nil?
+      end
     end
 
-    should "stem base words to just the base word" do
-      assert_equal @stemmer.stem('man'), 'man'
-      assert_equal @stemmer.stem('happiness'), 'happiness'
+    context "other functionality" do
+      should "return the number of rules the stemmer is currently using" do
+        assert @stemmer.num_rules.is_a?(Numeric)
+      end
+    end
+  end
+
+  context "A modified UEAStemmer instance" do
+    setup do
+      @stemmer = UEAStemmer.new(5, 3)     # max word length = 5, max acronym length = 3
     end
 
-    should "stem theses as thesis but not bases as basis" do
-      assert_equal @stemmer.stem('theses'), 'thesis'
-      assert_not_equal @stemmer.stem('bases'), 'basis'
+    should "have modified max word and max acronym sizes" do
+      assert @stemmer.max_word_length == 5
+      assert @stemmer.max_acronym_length == 3
     end
 
-    should "stem preterite words ending in -ed without the -ed" do
-      assert_equal @stemmer.stem('ordained'), 'ordain'
-      assert_equal @stemmer.stem('killed'), 'kill'
-      assert_equal @stemmer.stem('liked'), 'like'
-      assert_equal @stemmer.stem('helped'), 'help'
-      assert_equal @stemmer.stem('scarred'), 'scar'
+    should "reject a longer word with rule 95" do
+      word = @stemmer.stem_with_rule('deoxyribonucleicacid')
+      assert_equal word.rule_num, 95
     end
 
-    should "stem progressive verbs and gerunds without the -ing" do
-      assert_equal @stemmer.stem('running'), 'run'
-      assert_equal @stemmer.stem('settings'), 'set'
-      assert_equal @stemmer.stem('timing'), 'time'
-      assert_equal @stemmer.stem('dying'), 'die'
-      assert_equal @stemmer.stem('harping'), 'harp'
-      assert_equal @stemmer.stem('charring'), 'char'
+    should "reject a longer acronym with rule " do
+      word = @stemmer.stem_with_rule('CAVASSOO')
+      assert_equal word.rule_num, 96
     end
 
-    should "stem various plural nouns and 3rd-pres verbs without the -s/-es" do
-      assert_equal @stemmer.stem('changes'), 'change'
-      assert_equal @stemmer.stem('deaths'), 'death'
-      assert_equal @stemmer.stem('shadows'), 'shadow'
-      assert_equal @stemmer.stem('flies'), 'fly'
-      assert_equal @stemmer.stem('things'), 'thing'
-      assert_equal @stemmer.stem('nothings'), 'nothing'   # as in 'sweet nothings'
-      assert_equal @stemmer.stem('witches'), 'witch'
+  end
+
+  context "A Word instance" do
+    setup do
+      @word = UEAStemmer::Word.new('helpers', 68, UEAStemmer::EndingRule.new('s', 1, 68)) # sample word
+      @stemmer = UEAStemmer.new
     end
 
-    # assert @stemmer.stem('') == ''
+    should "return the rule used to derive the stem" do
+      assert @word.rule.kind_of?(UEAStemmer::Rule)
+    end
+
+    should "return the number of the rule used to derive the stem" do
+      assert @word.rule_num.kind_of?(Numeric)
+    end
+
+    should "return the stemmed word as a String" do
+      assert @word.word.kind_of?(String)
+    end
+  end
+
+  context "A Rule instance" do
+    setup do
+      @rule = UEAStemmer::Rule.new(/.*s$/i, 1, 555)
+    end
+
+    should "return the rule number" do
+      assert @rule.rule_num.kind_of?(Numeric)
+    end
+
+    should "return the pattern being matched" do
+      assert @rule.pattern.kind_of?(String) || @rule.pattern.kind_of?(Regexp)
+    end
+
+    should "return the size of the suffix that is being removed" do
+      assert @rule.suffix_size.kind_of?(Numeric)
+    end
   end
 end
