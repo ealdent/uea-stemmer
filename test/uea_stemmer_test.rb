@@ -104,7 +104,6 @@ class UeaStemmerTest < Test::Unit::TestCase
       word = @stemmer.stem_with_rule('CAVASSOO')
       assert_equal word.rule_num, 96
     end
-
   end
 
   context "A Word instance" do
@@ -150,6 +149,33 @@ class UeaStemmerTest < Test::Unit::TestCase
 
     should "return nil when match is unsuccessful" do
       assert @rule.handle('help').nil?
+    end
+  end
+
+  context "A String instance" do
+    context "ends_with? method" do
+      should "return true when a string ends with a suffix" do
+        assert_equal 'happy'.ends_with?('y'), true
+      end
+
+      should "return false when a string does not end with a suffix" do
+        assert_equal 'happy'.ends_with?('b'), false
+      end
+    end
+
+    context "remove_suffix method" do
+      should "return a string with the suffix missing, leaving the original string intact" do
+        word = "hello"
+        new_word = word.remove_suffix(2)
+        assert_equal new_word.ends_with?('lo'), false
+        assert_equal word.ends_with?('lo'), true
+      end
+    end
+
+    context "stem method" do
+      should "stem a word" do
+        assert_equal 'helpers'.stem, 'helper'
+      end
     end
   end
 end
