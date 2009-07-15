@@ -151,38 +151,4 @@ class UeaStemmerTest < Test::Unit::TestCase
       assert @rule.handle('help').nil?
     end
   end
-
-  context "A String instance" do
-    context "ends_with? method" do
-      should "return true when a string ends with a suffix" do
-        assert_equal 'happy'.ends_with?('y'), true
-      end
-
-      should "return false when a string does not end with a suffix" do
-        assert_equal 'happy'.ends_with?('b'), false
-      end
-    end
-
-    context "remove_suffix method" do
-      should "return a string with the suffix missing, leaving the original string intact" do
-        word = "hello"
-        new_word = word.remove_suffix(2)
-        assert_equal new_word.ends_with?('lo'), false
-        assert_equal word.ends_with?('lo'), true
-      end
-    end
-
-    context "stem method" do
-      should "stem a word" do
-        assert_equal 'helpers'.stem, 'helper'
-      end
-    end
-
-    context "stem with rule method" do
-      should "stem a word and return a word object" do
-        assert 'helpers'.stem_with_rule.kind_of?(UEAStemmer::Word)
-        assert_equal 'helpers'.stem_with_rule.word, 'helper'
-      end
-    end
-  end
 end

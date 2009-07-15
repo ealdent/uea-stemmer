@@ -18,8 +18,12 @@
 # from Perl by Richard Churchill.  Ported from Java to Ruby by Jason M. Adams.
 #
 
+require 'uea-stemmer/string_helpers'
+
 class UEAStemmer
   class Rule
+    include StringHelpers
+
     attr_reader :pattern, :suffix_size, :rule_num
 
     def initialize(pattern, suffix_size, rule_num)
@@ -29,7 +33,7 @@ class UEAStemmer
     end
 
     def handle(word)
-      [word.remove_suffix(@suffix_size), @rule_num, self] if word =~ @pattern
+      [remove_suffix(word, @suffix_size), @rule_num, self] if word =~ @pattern
     end
 
     def to_s
@@ -39,7 +43,7 @@ class UEAStemmer
 
   class EndingRule < Rule
     def handle(word)
-      [word.remove_suffix(@suffix_size), @rule_num, self] if word.ends_with?(@pattern)
+      [remove_suffix(word, @suffix_size), @rule_num, self] if ends_with?(word, @pattern)
     end
 
     def to_s
@@ -56,7 +60,7 @@ class UEAStemmer
     end
 
     def handle(word)
-      [word.remove_suffix(@suffix_size) + @new_suffix, @rule_num, self] if word.ends_with?(@pattern)
+      [remove_suffix(word, @suffix_size) + @new_suffix, @rule_num, self] if ends_with?(word, @pattern)
     end
 
     def to_s
@@ -86,8 +90,8 @@ class UEAStemmer
     protected
 
     def stem_with_duplicate_character_check(word)
-      new_suffix_size = word.ends_with?('s') ? @suffix_size + 1 : @suffix_size
-      stemmed_word = word.remove_suffix(new_suffix_size)
+      new_suffix_size = ends_with?(word, 's') ? @suffix_size + 1 : @suffix_size
+      stemmed_word = remove_suffix(word, new_suffix_size)
       stemmed_word.chop! if stemmed_word =~ /.*(\w)\1$/
       stemmed_word
     end

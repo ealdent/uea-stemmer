@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{uea-stemmer}
-  s.version = "0.9.5"
+  s.version = "0.9.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marie-Claire Jenkins", "Dan J. Smith", "Richard Churchill", "Jason Adams"]
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/rule.rb",
-     "lib/string_extensions.rb",
+     "lib/uea-stemmer/string_helpers.rb",
      "lib/uea-stemmer.rb",
      "lib/word.rb",
      "test/test_helper.rb",

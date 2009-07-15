@@ -20,10 +20,12 @@
 
 require 'rule'
 require 'word'
-require 'string_extensions'
+require 'uea-stemmer/string_helpers'
 require 'singleton'
 
 class UEAStemmer
+  include StringHelpers
+
   attr_accessor :max_acronym_length, :max_word_length
   attr_reader :rules
 
@@ -47,9 +49,9 @@ class UEAStemmer
       Word.new(word, 95)
     elsif word.index("'")
       if word =~ /^.*'[s]$/i
-        stemmed_word = stemmed_word.remove_suffix(2)
+        stemmed_word = remove_suffix(stemmed_word, 2)
       elsif word =~ /^.*'$/
-        stemmed_word = stemmed_word.remove_suffix(1)
+        stemmed_word = remove_suffix(stemmed_word, 1)
       end
 
       stemmed_word.gsub!(/n't/, ' not')
