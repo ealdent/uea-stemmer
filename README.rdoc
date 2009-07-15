@@ -1,6 +1,6 @@
 = uea-stemmer
 
-Similar to other stemmers, UEA-Lite operates on a set of rules which are used as steps. There are two groups of rules: the first to clean the tokens, and the second to alter suffixes.
+Similar to other stemmers, UEA-Lite[http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming] operates on a set of rules which are used as steps. There are two groups of rules: the first to clean the tokens, and the second to alter suffixes.
 
 The first group of rules first avoids a small list of six frequent problem words. An improvement to the stemmer would be to expand this list by adding other problem words which the second rule set cannot deal with. Second, possessive apostrophes are removed and contractions are expanded. All hyphens are removed and tokens containing digits are left untouched. Strings which are all upper case and digits are left untouched unless there is a lower case terminal 's' (i.e. transforming plural forms of acronyms to singular forms).
 
@@ -9,6 +9,8 @@ Proper nouns should not usually be stemmed, except to remove possessives; our im
 Many texts, particularly scientific papers, contain sequences of digits, single letters, and other non-word tokens. Our implementation ignores tokens containing digits, single-letter tokens, and tokens with embedded punctuation.
 
 The second group of rules contains 139 suffix rules, each testing for a specific type of suffix. The rules are set in a particular order so that the longest suffix applicable is used rather a shorter one which could lead to nonsense words and more words not stemmed entirely to their root form.
+
+This is a port to Ruby from the port to Java from the original Perl script by Marie-Claire Jenkins and Dr. Dan J. Smith at the University of East Anglia.
 
 == Installation
 
@@ -36,9 +38,9 @@ Typical usage:
   'bodies'.stem             # body
   'ordained'.stem           # ordain
 
-You can also extract the stemmed word along with the rule by using the `decorated_stem` method.
+You can also extract the stemmed word along with the rule by using the `stem_with_rule` method.
 
-  stem = stemmer.decorated_stem('invited')   # Word('invite', Rule #22)
+  stem = stemmer.stem_with_rule('invited')   # Word('invite', Rule #22)
   puts stem.rule  # rule #22 (remove -ed when the word ends in -ted)
 
 == Note on Patches/Pull Requests
