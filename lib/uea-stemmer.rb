@@ -68,7 +68,16 @@ class UEAStemmer
   end
 
   def num_rules
-    @rules.map { |r| r.rule_num }.uniq.size + 3    # two rules not covered by the rules array
+    @rules.map { |r| r.rule_num }.uniq.size + 4    # four rules not covered by the rules array
+  end
+
+  def add_rule(rule)
+    if rule.kind_of?(Rule)
+      @rules << rule.dup.freeze
+      true
+    else
+      false
+    end
   end
 
   private

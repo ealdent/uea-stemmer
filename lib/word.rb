@@ -23,7 +23,7 @@ class UEAStemmer
     attr_reader :word, :rule_num, :rule
 
     def initialize(word, rule_num, rule = nil)
-      @word = word
+      @word = word.dup.freeze
       @rule_num = rule_num
       @rule = rule
     end

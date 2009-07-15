@@ -23,7 +23,7 @@ class UEAStemmer
     attr_reader :pattern, :suffix_size, :rule_num
 
     def initialize(pattern, suffix_size, rule_num)
-      @pattern = pattern
+      @pattern = pattern.dup.freeze
       @suffix_size = suffix_size
       @rule_num = rule_num
     end
@@ -52,7 +52,7 @@ class UEAStemmer
 
     def initialize(pattern, suffix_size, rule_num, new_suffix)
       super(pattern, suffix_size, rule_num)
-      @new_suffix = new_suffix
+      @new_suffix = new_suffix.dup.freeze
     end
 
     def handle(word)
