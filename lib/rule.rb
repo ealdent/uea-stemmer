@@ -20,7 +20,7 @@
 
 class UEAStemmer
   class Rule
-    attr_accessor :pattern, :suffix_size, :rule_num
+    attr_reader :pattern, :suffix_size, :rule_num
 
     def initialize(pattern, suffix_size, rule_num)
       @pattern = pattern
@@ -48,7 +48,7 @@ class UEAStemmer
   end
 
   class ConcatenatingEndingRule < EndingRule
-    attr_accessor :new_suffix
+    attr_reader :new_suffix
 
     def initialize(pattern, suffix_size, rule_num, new_suffix)
       super(pattern, suffix_size, rule_num)

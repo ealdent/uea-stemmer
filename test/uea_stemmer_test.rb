@@ -52,6 +52,13 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('nothings'), 'nothing'   # as in 'sweet nothings'
         assert_equal @stemmer.stem('witches'), 'witch'
       end
+
+      should "stem acronyms when pluralized otherwise they should be left alone" do
+        assert_equal @stemmer.stem('USA'), 'USA'
+        assert_equal @stemmer.stem('FLOSS'), 'FLOSS'
+        assert_equal @stemmer.stem('MREs'), 'MRE'
+        assert_equal @stemmer.stem('USAED'), 'USAED'
+      end
     end
 
     context "stem_with_rule method" do
@@ -129,6 +136,15 @@ class UeaStemmerTest < Test::Unit::TestCase
 
     should "return the size of the suffix that is being removed" do
       assert @rule.suffix_size.kind_of?(Numeric)
+    end
+
+    should "return a stemmed word, a rule number, and a rule on a successful match" do
+      word, rule_num, tmp_rule = @rule.handle('helps')
+      assert word.is_a?(String) && rule_num.is_a?(Numeric) && tmp_rule.is_a?(UEAStemmer::Rule)
+    end
+
+    should "return nil when match is unsuccessful" do
+      assert @rule.handle('help').nil?
     end
   end
 end

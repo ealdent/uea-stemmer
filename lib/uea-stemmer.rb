@@ -23,7 +23,8 @@ require 'word'
 require 'string_extensions'
 
 class UEAStemmer
-  attr_accessor :max_acronym_length, :max_word_length, :rules
+  attr_accessor :max_acronym_length, :max_word_length
+  attr_reader :rules
 
   def initialize(max_word_length = nil, max_acronym_length = nil)
     @max_word_length = max_word_length || 'deoxyribonucleicacid'.size
@@ -39,10 +40,10 @@ class UEAStemmer
 
     if problem_word?(word)
       Word.new(word, 94)
-    elsif word.size > @max_word_length
-      Word.new(word, 95)
     elsif (word.size > @max_acronym_length && word =~ /^[A-Z]+$/) || (word.size > (@max_acronym_length + 1) && word =~ /^[A-Z]+s$/)
       Word.new(word, 96)      # added by JMA to catch long acronyms
+    elsif word.size > @max_word_length
+      Word.new(word, 95)
     elsif word.index("'")
       if word =~ /^.*'[s]$/i
         stemmed_word = stemmed_word.remove_suffix(2)
@@ -86,7 +87,7 @@ class UEAStemmer
     @rules << Rule.new(/^\w+-\w+$/, 0, 90.2)
     @rules << Rule.new(/^.*-.*$/, 0, 90.1)
     @rules << Rule.new(/^.*_.*$/, 0, 90)
-    @rules << Rule.new(/^[A-Z]+s$/, 0, 91.1)
+    @rules << Rule.new(/^[A-Z]+s$/, 1, 91.1)
     @rules << Rule.new(/^[A-Z]+$/, 0, 91)
     @rules << Rule.new(/^((.*[A-Z].*[A-Z])|([A-Z]{1})).*$/, 0, 92)
 
@@ -311,6 +312,10 @@ class UEAStemmer
     @rules << EndingRule.new('ums', 0, 66)
     @rules << EndingRule.new('us', 0, 67)
     @rules << EndingRule.new('s', 1, 68)
+
+    @rules.each { |r| r.freeze }
+
+    nil
   end
 
   def problem_word?(word)

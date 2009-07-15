@@ -20,7 +20,7 @@
 
 class UEAStemmer
   class Word
-    attr_accessor :word, :rule_num, :rule
+    attr_reader :word, :rule_num, :rule
 
     def initialize(word, rule_num, rule = nil)
       @word = word
