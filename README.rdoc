@@ -48,6 +48,7 @@ You can also extract the stemmed word along with the rule by using the `stem_wit
 == TODO
 
 * test handling of POS tags
+* add tests to mimic methodology used in the paper
 
 == Note on Patches/Pull Requests
 
