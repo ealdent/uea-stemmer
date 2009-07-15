@@ -47,7 +47,7 @@ You can also extract the stemmed word along with the rule by using the `stem_wit
 
 == TODO
 
-This has not been tested with POS tags yet.
+* test handling of POS tags
 
 == Note on Patches/Pull Requests
 
