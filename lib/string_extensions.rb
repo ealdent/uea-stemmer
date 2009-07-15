@@ -28,6 +28,6 @@ class String
   end
 
   def stem
-    UEAStemmer.new.stem(self)
+    DefaultUEAStemmer.instance.stem(self)
   end
 end

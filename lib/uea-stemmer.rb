@@ -21,6 +21,7 @@
 require 'rule'
 require 'word'
 require 'string_extensions'
+require 'singleton'
 
 class UEAStemmer
   attr_accessor :max_acronym_length, :max_word_length
@@ -331,4 +332,8 @@ class UEAStemmer
     ['is', 'as', 'this', 'has', 'was', 'during', 'menses'].include?(word)
   end
 
+end
+
+class DefaultUEAStemmer < UEAStemmer
+  include Singleton
 end
