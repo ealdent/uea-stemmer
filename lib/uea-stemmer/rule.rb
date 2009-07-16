@@ -46,11 +46,7 @@ class UEAStemmer
 
     def initialize(pattern, suffix_size, rule_num)
       super(/^.*#{pattern}$/, suffix_size, rule_num)
-      @original_pattern = pattern
-    end
-
-    def handle(word)
-      [remove_suffix(word, @suffix_size), @rule_num, self] if ends_with?(word, @pattern)
+      @original_pattern = pattern.dup.freeze
     end
 
     def to_s
@@ -67,7 +63,7 @@ class UEAStemmer
     end
 
     def handle(word)
-      [remove_suffix(word, @suffix_size) + @new_suffix, @rule_num, self] if ends_with?(word, @pattern)
+      [remove_suffix(word, @suffix_size) + @new_suffix, @rule_num, self] if word =~ @pattern
     end
 
     def to_s
