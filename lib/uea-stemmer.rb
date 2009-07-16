@@ -159,7 +159,7 @@ class UEAStemmer
     @rules << EndingRule.new('noted', 1, 22.6)
     @rules << EndingRule.new('leted', 1, 22.5)
     @rules << Rule.new(/^.*[^vm]ited$/, 2, 22.4)
-    @rules << Rule.new(/^.*[vm]ited$/, 1, 22.3)
+    @rules << Rule.new(/^.*(ch|[vm])i[td]ed$/, 1, 22.3)
     @rules << EndingRule.new('uted', 1, 22.2)
     @rules << EndingRule.new('ated', 1, 22.1)
     @rules << EndingRule.new('ted', 2, 22)
