@@ -302,6 +302,7 @@ class UEAStemmer
 
     # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('dying', 4, 58.2, 'ie')   # added by JMA
+    @rules << ExhaustiveConcatenatingEndingRule.new('lying', 4, 58.2, 'ie')   # added by JMA    (lying vs flying)
     @rules << ConcatenatingEndingRule.new('tying', 4, 58.2, 'ie')   # added by JMA
     @rules << EndingRule.new('thing', 0, 58.1)
     @rules << EndingRule.new('things', 1, 58.1)

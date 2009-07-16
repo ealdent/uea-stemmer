@@ -81,6 +81,12 @@ class UEAStemmer
     end
   end
 
+  class ExhaustiveConcatenatingEndingRule < ConcatenatingEndingRule
+    def handle(word)
+      super(word) if word == @original_pattern
+    end
+  end
+
   class CustomRule < Rule
     def initialize(pattern, suffix_size, rule_num)
       super(pattern, suffix_size, rule_num)
