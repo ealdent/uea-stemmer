@@ -42,12 +42,19 @@ class UEAStemmer
   end
 
   class EndingRule < Rule
+    attr_reader :original_pattern
+
+    def initialize(pattern, suffix_size, rule_num)
+      super(/^.*#{pattern}$/, suffix_size, rule_num)
+      @original_pattern = pattern
+    end
+
     def handle(word)
       [remove_suffix(word, @suffix_size), @rule_num, self] if ends_with?(word, @pattern)
     end
 
     def to_s
-      "rule ##{@rule_num} (remove -#{@pattern[@pattern.size - @suffix_size, @suffix_size]} when the word ends in -#{@pattern})"
+      "rule ##{@rule_num} (remove -#{@original_pattern[@original_pattern.size - @suffix_size, @suffix_size]} when the word ends in -#{@original_pattern})"
     end
   end
 
@@ -64,17 +71,17 @@ class UEAStemmer
     end
 
     def to_s
-      "rule ##{@rule_num} (remove -#{@pattern[@pattern.size - @suffix_size, @suffix_size]} and add -#{new_suffix} when the word ends in -#{@pattern})"
+      "rule ##{@rule_num} (remove -#{@original_pattern[@original_pattern.size - @suffix_size, @suffix_size]} and add -#{new_suffix} when the word ends in -#{@original_pattern})"
     end
   end
 
   class NonExhaustiveEndingRule < EndingRule
     def handle(word)
-      super(word) if word != @pattern
+      super(word) if word != @original_pattern
     end
 
     def to_s
-      "rule ##{@rule_num} (remove -#{@pattern[@pattern.size - @suffix_size, @suffix_size]} when the word ends in -#{@pattern} unless the word is #{@pattern})"
+      "rule ##{@rule_num} (remove -#{@original_pattern[@original_pattern.size - @suffix_size, @suffix_size]} when the word ends in -#{@original_pattern} unless the word is #{@original_pattern})"
     end
   end
 
