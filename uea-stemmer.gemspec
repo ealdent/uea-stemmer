@@ -20,10 +20,10 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "lib/rule.rb",
+     "lib/uea-stemmer/rule.rb",
      "lib/uea-stemmer/string_helpers.rb",
      "lib/uea-stemmer.rb",
-     "lib/word.rb",
+     "lib/uea-stemmer/word.rb",
      "test/test_helper.rb",
      "test/uea_stemmer_test.rb",
      "uea-stemmer.gemspec"

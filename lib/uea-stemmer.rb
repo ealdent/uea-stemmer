@@ -18,8 +18,8 @@
 # from Perl by Richard Churchill.  Ported from Java to Ruby by Jason M. Adams.
 #
 
-require 'rule'
-require 'word'
+require 'uea-stemmer/rule'
+require 'uea-stemmer/word'
 require 'uea-stemmer/string_helpers'
 require 'singleton'
 
