@@ -74,6 +74,10 @@ class UEAStemmer
     @rules.map { |r| r.rule_num }.uniq.size + 4    # four rules not covered by the rules array
   end
 
+  def to_s
+    "UEA-Lite Stemmer (#{num_rules} rules)"
+  end
+
   def add_rule(rule)
     if rule.kind_of?(Rule)
       @rules << rule.dup.freeze
