@@ -183,6 +183,8 @@ class UEAStemmer
 
     # added some additional rules to handle other vowels and consonants
     # (added by Jason M. Adams)
+    @rules << EndingRule.new('oed', 1, 31.3)
+    @rules << EndingRule.new('oes', 1, 31.2)
     @rules << EndingRule.new('oked', 1, 31.1)
     @rules << EndingRule.new('aked', 1, 31.1)
     @rules << EndingRule.new('iked', 1, 31.1)
