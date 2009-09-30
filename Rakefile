@@ -5,11 +5,11 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "uea-stemmer"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Port of UEA-Lite Stemmer to Ruby, a conservative stemmer for search and indexing.}
+    gem.description = %Q{Port of UEA-Lite Stemmer to Ruby, a conservative stemmer for search and indexing.}
     gem.email = "jasonmadams@gmail.com"
     gem.homepage = "http://github.com/ealdent/uea-stemmer"
-    gem.authors = ["Jason Adams"]
+    gem.authors = ["Marie-Claire Jenkins", "Dan J. Smith", "Richard Churchill", "Jason Adams"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
 
