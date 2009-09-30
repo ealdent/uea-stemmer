@@ -329,6 +329,7 @@ class UEAStemmer
     @rules << EndingRule.new('ures', 1, 63.4)
     @rules << EndingRule.new('ines', 1, 63.3)
     @rules << EndingRule.new('ides', 1, 63.2)
+    @rules << EndingRule.new('kes', 1, 63.1)
     @rules << EndingRule.new('ges', 1, 63.1)
     @rules << EndingRule.new('es', 2, 63)
     @rules << ConcatenatingEndingRule.new('is', 2, 64, 'e')
