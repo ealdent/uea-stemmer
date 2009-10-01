@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{uea-stemmer}
-  s.version = "0.9.10"
+  s.version = "0.9.11"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marie-Claire Jenkins", "Dan J. Smith", "Richard Churchill", "Jason Adams"]
-  s.date = %q{2009-09-30}
+  s.date = %q{2009-10-01}
   s.description = %q{Port of UEA-Lite Stemmer to Ruby, a conservative stemmer for search and indexing.}
   s.email = %q{jasonmadams@gmail.com}
   s.extra_rdoc_files = [
