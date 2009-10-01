@@ -58,6 +58,7 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('witches'), 'witch'
         assert_equal @stemmer.stem('makes'), 'make'
         assert_equal @stemmer.stem('smokes'), 'smoke'
+        assert_equal @stemmer.stem('does'), 'do'
       end
 
       should "stem acronyms when pluralized otherwise they should be left alone" do
