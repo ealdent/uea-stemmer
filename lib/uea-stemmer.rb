@@ -27,11 +27,12 @@ class UEAStemmer
   include StringHelpers
 
   attr_accessor :max_acronym_length, :max_word_length
-  attr_reader :rules
+  attr_reader :rules, :options
 
-  def initialize(max_word_length = nil, max_acronym_length = nil)
+  def initialize(max_word_length = nil, max_acronym_length = nil, options = {})
     @max_word_length = max_word_length || 'deoxyribonucleicacid'.size
     @max_acronym_length = max_acronym_length || 'CAVASSOO'.size
+    @options = options.dup
 
     @rules = Array.new
     create_rules
@@ -54,10 +55,12 @@ class UEAStemmer
         stemmed_word = remove_suffix(stemmed_word, 1)
       end
 
-      stemmed_word.gsub!(/n't/, ' not')
-      stemmed_word.gsub!(/'ve/, ' have')
-      stemmed_word.gsub!(/'re/, ' are')
-      stemmed_word.gsub!(/'m/, ' am')
+      unless options[:skip_contractions]
+        stemmed_word.gsub!(/n't/, ' not')
+        stemmed_word.gsub!(/'ve/, ' have')
+        stemmed_word.gsub!(/'re/, ' are')
+        stemmed_word.gsub!(/'m/, ' am')
+      end
 
       Word.new(stemmed_word, 93)
     else
