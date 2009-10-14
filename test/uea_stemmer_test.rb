@@ -11,6 +11,11 @@ class UeaStemmerTest < Test::Unit::TestCase
       assert @stemmer.max_acronym_length == 'CAVASSOO'.size
     end
 
+    should "allow setting options" do
+      @stemmer.options[:test] = true
+      assert @stemmer.options[:test]
+    end
+
     context "stem method" do
       should "stem words as Strings" do
         assert @stemmer.stem('word').is_a?(String)
