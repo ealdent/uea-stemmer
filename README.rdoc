@@ -24,7 +24,7 @@ Install the gem from source:
   cd uea-stemmer
   rake install
 
-Depending on your setup, you may need to use `sudo` for either of these methods.
+Depending on your setup, you may need to use +sudo+ for either of these methods.
 
 == Example Usage
 
