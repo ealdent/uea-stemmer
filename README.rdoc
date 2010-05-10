@@ -41,7 +41,7 @@ Typical usage:
   'bodies'.stem             # body
   'ordained'.stem           # ordain
 
-You can also extract the stemmed word along with the rule by using the `stem_with_rule` method.
+You can also extract the stemmed word along with the rule by using the +stem_with_rule+ method.
 
   stem = stemmer.stem_with_rule('invited')   # Word('invite', Rule #22.3)
   puts stem.rule  # rule #22.3 (remove -d when the word ends in -ited)
