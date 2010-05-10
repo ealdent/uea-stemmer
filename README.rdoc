@@ -14,16 +14,17 @@ This is a port to Ruby from the port to Java from the original Perl script by Ma
 
 == Installation
 
-Install the gem via Github:
+Install the gem:
 
-  gem sources -a http://gems.github.com   # only need to do this once
-  sudo gem install ealdent-uea-stemmer
+  gem install uea-stemmer
 
 Install the gem from source:
 
   git clone git://github.com/ealdent/uea-stemmer.git
   cd uea-stemmer
   rake install
+
+Depending on your setup, you may need to use `sudo` for either of these methods.
 
 == Example Usage
 
