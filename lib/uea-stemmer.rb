@@ -326,6 +326,8 @@ class UEAStemmer
     @rules << EndingRule.new('oded', 1, 61.1)
     @rules << EndingRule.new('ated', 1, 61)
     @rules << CustomRule.new(/.*\w\weds?$/, 2, 62)
+    @rules << EndingRule.new('des', 1, 63.10) # Fix for words like grades, escapades, abodes
+    @rules << EndingRule.new('res', 1, 63.9) # Fix for words like fires, acres, wires, cares
     @rules << EndingRule.new('pes', 1, 63.8)
     @rules << EndingRule.new('mes', 1, 63.7)
     @rules << EndingRule.new('ones', 1, 63.6)

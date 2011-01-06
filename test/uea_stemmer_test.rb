@@ -65,6 +65,20 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('smokes'), 'smoke'
         assert_equal @stemmer.stem('does'), 'do'
       end
+      
+      should "stem various words with -des suffix" do
+        assert_equal @stemmer.stem('abodes'), 'abode'
+        assert_equal @stemmer.stem('escapades'), 'escapade'
+        assert_equal @stemmer.stem('crusades'), 'crusade'
+        assert_equal @stemmer.stem('grades'), 'grade'
+      end
+      
+      should "stem various words with -res suffix" do
+        assert_equal @stemmer.stem('wires'), 'wire'
+        assert_equal @stemmer.stem('acres'), 'acre'
+        assert_equal @stemmer.stem('fires'), 'fire'
+        assert_equal @stemmer.stem('cares'), 'care'
+      end
 
       should "stem acronyms when pluralized otherwise they should be left alone" do
         assert_equal @stemmer.stem('USA'), 'USA'
