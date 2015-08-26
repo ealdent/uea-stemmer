@@ -1,6 +1,6 @@
 = uea-stemmer
 
-Similar to other stemmers, UEA-Lite[http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming] operates on a set of rules which are used as steps. There are two groups of rules: the first to clean the tokens, and the second to alter suffixes.
+Similar to other stemmers, UEA-Lite[https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming] operates on a set of rules which are used as steps. There are two groups of rules: the first to clean the tokens, and the second to alter suffixes.
 
 The first group of rules first avoids a small list of six frequent problem words. An improvement to the stemmer would be to expand this list by adding other problem words which the second rule set cannot deal with. Second, possessive apostrophes are removed and contractions are expanded. All hyphens are removed and tokens containing digits are left untouched. Strings which are all upper case and digits are left untouched unless there is a lower case terminal 's' (i.e. transforming plural forms of acronyms to singular forms).
 
@@ -63,7 +63,7 @@ You can also extract the stemmed word along with the rule by using the +stem_wit
 
 == Relevant Web Pages
 
-* http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming
+* https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming
 * Stemming[http://en.wikipedia.org/wiki/Stemming]
 
 == Copyright
