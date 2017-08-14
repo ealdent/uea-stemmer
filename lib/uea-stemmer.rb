@@ -109,6 +109,7 @@ class UEAStemmer
     @rules << Rule.new(/^[A-Z]+s$/, 1, 91.1)
     @rules << Rule.new(/^[A-Z]+$/, 0, 91)
     @rules << Rule.new(/^((.*[A-Z].*[A-Z])|([A-Z]{1})).*$/, 0, 92)
+    @rules << Rule.new(/^[a-z]{1}(|[rl])ing$/i, 0, 97)
 
     @rules << EndingRule.new('aceous', 6, 1)
     @rules << EndingRule.new('ces', 1, 2)

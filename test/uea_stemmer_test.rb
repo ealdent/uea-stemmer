@@ -53,6 +53,14 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('charring'), 'char'
       end
 
+      should "not stem false progressive verbs such as 'sing'" do
+        assert_equal @stemmer.stem('ring'),  'ring'
+        assert_equal @stemmer.stem('sing'),  'sing'
+        assert_equal @stemmer.stem('ring'),  'ring'
+        assert_equal @stemmer.stem('bring'), 'bring'
+        assert_equal @stemmer.stem('fling'), 'fling'
+      end
+
       should "stem various plural nouns and 3rd-pres verbs without the -s/-es" do
         assert_equal @stemmer.stem('changes'), 'change'
         assert_equal @stemmer.stem('deaths'), 'death'
@@ -65,14 +73,14 @@ class UeaStemmerTest < Test::Unit::TestCase
         assert_equal @stemmer.stem('smokes'), 'smoke'
         assert_equal @stemmer.stem('does'), 'do'
       end
-      
+
       should "stem various words with -des suffix" do
         assert_equal @stemmer.stem('abodes'), 'abode'
         assert_equal @stemmer.stem('escapades'), 'escapade'
         assert_equal @stemmer.stem('crusades'), 'crusade'
         assert_equal @stemmer.stem('grades'), 'grade'
       end
-      
+
       should "stem various words with -res suffix" do
         assert_equal @stemmer.stem('wires'), 'wire'
         assert_equal @stemmer.stem('acres'), 'acre'
