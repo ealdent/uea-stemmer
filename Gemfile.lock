@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.0.4)
+    activesupport (7.0.4.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -41,7 +41,7 @@ GEM
     jwt (2.5.0)
     mime-types (2.99.3)
     mini_portile2 (2.8.0)
-    minitest (5.16.3)
+    minitest (5.17.0)
     multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
