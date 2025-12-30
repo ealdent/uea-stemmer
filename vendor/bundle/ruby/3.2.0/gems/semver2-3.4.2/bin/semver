@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'runner'
+
+begin
+  XSemVer::Runner.new *ARGV
+rescue XSemVer::Runner::CommandError => e
+  puts e.message
+  puts "#{$0} help for more info"
+  exit 1
+end
