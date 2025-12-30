@@ -1,2 +1,0 @@
-class SemVerMissingError < RuntimeError
-end
