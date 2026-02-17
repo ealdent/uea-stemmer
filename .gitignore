@@ -3,4 +3,7 @@
 coverage
 rdoc
 pkg
+Gemfile.lock
+.bundle
+vendor/bundle
 *.tmproj
