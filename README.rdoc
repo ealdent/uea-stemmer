@@ -1,16 +1,27 @@
 = uea-stemmer
 
-Similar to other stemmers, UEA-Lite[https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming] operates on a set of rules which are used as steps. There are two groups of rules: the first to clean the tokens, and the second to alter suffixes.
+Ruby implementation of the UEA-Lite stemmer for conservative stemming in
+search and indexing workloads.
 
-The first group of rules first avoids a small list of six frequent problem words. An improvement to the stemmer would be to expand this list by adding other problem words which the second rule set cannot deal with. Second, possessive apostrophes are removed and contractions are expanded. All hyphens are removed and tokens containing digits are left untouched. Strings which are all upper case and digits are left untouched unless there is a lower case terminal 's' (i.e. transforming plural forms of acronyms to singular forms).
+UEA-Lite[https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming]
+uses a rule set to normalize suffixes while avoiding aggressive stemming.
 
-Proper nouns should not usually be stemmed, except to remove possessives; our implementation will respect PoS tags if they are present. If the text is untagged the stemmer uses the simple heuristic that any capitalized token not preceded by sentence breaking punctuation is a proper noun.
+== Behavior Notes
 
-Many texts, particularly scientific papers, contain sequences of digits, single letters, and other non-word tokens. Our implementation ignores tokens containing digits, single-letter tokens, and tokens with embedded punctuation.
+The stemmer operates on a single token at a time and returns a stemmed token.
 
-The second group of rules contains 139 suffix rules, each testing for a specific type of suffix. The rules are set in a particular order so that the longest suffix applicable is used rather a shorter one which could lead to nonsense words and more words not stemmed entirely to their root form.
+Notable behavior of this implementation:
 
-This is a port to Ruby from the port to Java from the original Perl script by Marie-Claire Jenkins and Dr. Dan J. Smith at the University of East Anglia.
+* possessive apostrophes are removed
+* contractions are expanded by default (for example, <tt>don't</tt> becomes
+  <tt>do not</tt>)
+* tokens beginning with uppercase letters are preserved, and pluralized
+  acronyms ending in a lowercase <tt>s</tt> are singularized
+* pure numbers, and tokens containing hyphens/underscores, are passed through
+  unchanged
+
+This is a port to Ruby from the Java port of the original Perl script by
+Marie-Claire Jenkins and Dr. Dan J. Smith at the University of East Anglia.
 
 == Installation
 
@@ -18,57 +29,57 @@ Install the gem:
 
   gem install uea-stemmer
 
-Install the gem from source:
+Install from source:
 
-  git clone git://github.com/ealdent/uea-stemmer.git
+  git clone https://github.com/ealdent/uea-stemmer.git
   cd uea-stemmer
-  rake install
-
-Depending on your setup, you may need to use +sudo+ for either of these methods.
+  bundle install
+  bundle exec rake test
+  bundle exec rake install
 
 == Example Usage
 
-Typical usage:
+Basic usage:
 
-  require 'uea-stemmer'
+  require "uea-stemmer"
   stemmer = UEAStemmer.new
 
-  stemmer.stem('helpers')   # helper
-  stemmer.stem('dying')     # die
-  stemmer.stem('scarred')   # scar
+  stemmer.stem("helpers")   # => "helper"
+  stemmer.stem("dying")     # => "die"
+  stemmer.stem("scarred")   # => "scar"
 
-  'buries'.stem             # bury
-  'bodies'.stem             # body
-  'ordained'.stem           # ordain
+You can extract the matching rule with +stem_with_rule+:
 
-You can also extract the stemmed word along with the rule by using the +stem_with_rule+ method.
+  result = stemmer.stem_with_rule("invited")
+  result.word      # => "invite"
+  result.rule_num  # => 22.3
+  result.rule      # => #<UEAStemmer::Rule ...>
 
-  stem = stemmer.stem_with_rule('invited')   # Word('invite', Rule #22.3)
-  puts stem.rule  # rule #22.3 (remove -d when the word ends in -ited)
+Disable contraction expansion:
 
-== TODO
+  UEAStemmer.new(nil, nil, skip_contractions: true).stem("don't")
+  # => "don't"
 
-* test handling of POS tags
-* add tests to mimic methodology used in the paper
+Use the singleton instance:
 
-== Note on Patches/Pull Requests
+  DefaultUEAStemmer.instance.stem("running")  # => "run"
+
+== Contributing
 
 * Fork the project.
 * Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
+* Add or update tests.
+* Run +bundle exec rake test+.
 * Send me a pull request. Bonus points for topic branches.
 
 == Relevant Web Pages
 
 * https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming
-* Stemming[http://en.wikipedia.org/wiki/Stemming]
+* Stemming[https://en.wikipedia.org/wiki/Stemming]
 
 == Copyright
 
 Copyright (c) 2005 by the University of East Anglia and authored by Marie-Claire Jenkins and Dr. Dan J Smith.  This port to Ruby was done by Jason Adams using the port to Java by Richard Churchill.
 
-This project is distributed under the Apache 2.0 License[http://www.apache.org/licenses/LICENSE-2.0]. See LICENSE for details.
-
+This project is distributed under the Apache 2.0
+License[https://www.apache.org/licenses/LICENSE-2.0]. See LICENSE for details.
