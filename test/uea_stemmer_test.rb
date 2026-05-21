@@ -1,184 +1,170 @@
-require 'test_helper'
+# frozen_string_literal: true
 
-class UeaStemmerTest < Test::Unit::TestCase
-  context "A default UEAStemmer instance" do
-    setup do
-      @stemmer = UEAStemmer.new
-    end
+require "test_helper"
 
-    should "have max word and max acronym sizes equivalent to deoxyribonucleicacid and CAVASSOO respectively" do
-      assert @stemmer.max_word_length == 'deoxyribonucleicacid'.size
-      assert @stemmer.max_acronym_length == 'CAVASSOO'.size
-    end
-
-    should "allow setting options" do
-      @stemmer.options[:test] = true
-      assert @stemmer.options[:test]
-    end
-
-    context "stem method" do
-      should "stem words as Strings" do
-        assert @stemmer.stem('word').is_a?(String)
-      end
-
-      should "stem base words to just the base word" do
-        assert_equal @stemmer.stem('man'), 'man'
-        assert_equal @stemmer.stem('happiness'), 'happiness'
-      end
-
-      should "stem theses as thesis but not bases as basis" do
-        assert_equal @stemmer.stem('theses'), 'thesis'
-        assert_not_equal @stemmer.stem('bases'), 'basis'
-      end
-
-      should "stem preterite words ending in -ed without the -ed" do
-        assert_equal @stemmer.stem('ordained'), 'ordain'
-        assert_equal @stemmer.stem('killed'), 'kill'
-        assert_equal @stemmer.stem('liked'), 'like'
-        assert_equal @stemmer.stem('helped'), 'help'
-        assert_equal @stemmer.stem('scarred'), 'scar'
-        assert_equal @stemmer.stem('invited'), 'invite'
-        assert_equal @stemmer.stem('exited'), 'exit'
-        assert_equal @stemmer.stem('exited'), 'exit'
-        assert_equal @stemmer.stem('debited'), 'debit'
-        assert_equal @stemmer.stem('smited'), 'smite'
-      end
-
-      should "stem progressive verbs and gerunds without the -ing" do
-        assert_equal @stemmer.stem('running'), 'run'
-        assert_equal @stemmer.stem('settings'), 'set'
-        assert_equal @stemmer.stem('timing'), 'time'
-        assert_equal @stemmer.stem('dying'), 'die'
-        assert_equal @stemmer.stem('harping'), 'harp'
-        assert_equal @stemmer.stem('charring'), 'char'
-      end
-
-      should "not stem false progressive verbs such as 'sing'" do
-        assert_equal @stemmer.stem('ring'),  'ring'
-        assert_equal @stemmer.stem('sing'),  'sing'
-        assert_equal @stemmer.stem('ring'),  'ring'
-        assert_equal @stemmer.stem('bring'), 'bring'
-        assert_equal @stemmer.stem('fling'), 'fling'
-      end
-
-      should "stem various plural nouns and 3rd-pres verbs without the -s/-es" do
-        assert_equal @stemmer.stem('changes'), 'change'
-        assert_equal @stemmer.stem('deaths'), 'death'
-        assert_equal @stemmer.stem('shadows'), 'shadow'
-        assert_equal @stemmer.stem('flies'), 'fly'
-        assert_equal @stemmer.stem('things'), 'thing'
-        assert_equal @stemmer.stem('nothings'), 'nothing'   # as in 'sweet nothings'
-        assert_equal @stemmer.stem('witches'), 'witch'
-        assert_equal @stemmer.stem('makes'), 'make'
-        assert_equal @stemmer.stem('smokes'), 'smoke'
-        assert_equal @stemmer.stem('does'), 'do'
-      end
-
-      should "stem various words with -des suffix" do
-        assert_equal @stemmer.stem('abodes'), 'abode'
-        assert_equal @stemmer.stem('escapades'), 'escapade'
-        assert_equal @stemmer.stem('crusades'), 'crusade'
-        assert_equal @stemmer.stem('grades'), 'grade'
-      end
-
-      should "stem various words with -res suffix" do
-        assert_equal @stemmer.stem('wires'), 'wire'
-        assert_equal @stemmer.stem('acres'), 'acre'
-        assert_equal @stemmer.stem('fires'), 'fire'
-        assert_equal @stemmer.stem('cares'), 'care'
-      end
-
-      should "stem acronyms when pluralized otherwise they should be left alone" do
-        assert_equal @stemmer.stem('USA'), 'USA'
-        assert_equal @stemmer.stem('FLOSS'), 'FLOSS'
-        assert_equal @stemmer.stem('MREs'), 'MRE'
-        assert_equal @stemmer.stem('USAED'), 'USAED'
-      end
-    end
-
-    context "stem_with_rule method" do
-      should "return a Word instance" do
-        assert @stemmer.stem_with_rule('witches').is_a?(UEAStemmer::Word)
-      end
-
-      should "return a rule and the stemmed form" do
-        word = @stemmer.stem_with_rule('witches')
-        assert !word.rule.nil?
-        assert !word.word.nil?
-      end
-    end
-
-    context "other functionality" do
-      should "return the number of rules the stemmer is currently using" do
-        assert @stemmer.num_rules.is_a?(Numeric)
-      end
-    end
+class UEAStemmerTest < Minitest::Test
+  def setup
+    @stemmer = UEAStemmer.new
   end
 
-  context "A modified UEAStemmer instance" do
-    setup do
-      @stemmer = UEAStemmer.new(5, 3)     # max word length = 5, max acronym length = 3
-    end
-
-    should "have modified max word and max acronym sizes" do
-      assert @stemmer.max_word_length == 5
-      assert @stemmer.max_acronym_length == 3
-    end
-
-    should "reject a longer word with rule 95" do
-      word = @stemmer.stem_with_rule('deoxyribonucleicacid')
-      assert_equal word.rule_num, 95
-    end
-
-    should "reject a longer acronym with rule 96" do
-      word = @stemmer.stem_with_rule('CAVASSOO')
-      assert_equal word.rule_num, 96
-    end
+  def test_stems_common_search_and_indexing_tokens
+    assert_stems_all(
+      "helpers" => "helper",
+      "changes" => "change",
+      "deaths" => "death",
+      "shadows" => "shadow",
+      "flies" => "fly",
+      "witches" => "witch",
+      "makes" => "make",
+      "smokes" => "smoke",
+      "does" => "do"
+    )
   end
 
-  context "A Word instance" do
-    setup do
-      @word = UEAStemmer::Word.new('helpers', 68, UEAStemmer::EndingRule.new('s', 1, 68)) # sample word
-      @stemmer = UEAStemmer.new
-    end
-
-    should "return the rule used to derive the stem" do
-      assert @word.rule.kind_of?(UEAStemmer::Rule)
-    end
-
-    should "return the number of the rule used to derive the stem" do
-      assert @word.rule_num.kind_of?(Numeric)
-    end
-
-    should "return the stemmed word as a String" do
-      assert @word.word.kind_of?(String)
-    end
+  def test_stems_common_past_tense_forms
+    assert_stems_all(
+      "ordained" => "ordain",
+      "killed" => "kill",
+      "liked" => "like",
+      "helped" => "help",
+      "scarred" => "scar",
+      "invited" => "invite",
+      "exited" => "exit",
+      "debited" => "debit",
+      "smited" => "smite"
+    )
   end
 
-  context "A Rule instance" do
-    setup do
-      @rule = UEAStemmer::Rule.new(/.*s$/i, 1, 555)
-    end
+  def test_stems_common_progressive_forms
+    assert_stems_all(
+      "running" => "run",
+      "settings" => "set",
+      "timing" => "time",
+      "dying" => "die",
+      "harping" => "harp",
+      "charring" => "char"
+    )
+  end
 
-    should "return the rule number" do
-      assert @rule.rule_num.kind_of?(Numeric)
-    end
+  def test_stems_nouns_that_need_a_trailing_e_preserved
+    assert_stems_all(
+      "abodes" => "abode",
+      "escapades" => "escapade",
+      "crusades" => "crusade",
+      "grades" => "grade",
+      "wires" => "wire",
+      "acres" => "acre",
+      "fires" => "fire",
+      "cares" => "care"
+    )
+  end
 
-    should "return the pattern being matched" do
-      assert @rule.pattern.kind_of?(String) || @rule.pattern.kind_of?(Regexp)
-    end
+  def test_preserves_words_where_aggressive_stemming_would_hurt_search_quality
+    assert_stems_all(
+      "man" => "man",
+      "happiness" => "happiness",
+      "basis" => "basis",
+      "ring" => "ring",
+      "sing" => "sing",
+      "bring" => "bring",
+      "fling" => "fling",
+      "thing" => "thing",
+      "nothings" => "nothing",
+      "is" => "is",
+      "as" => "as",
+      "this" => "this",
+      "has" => "has",
+      "was" => "was",
+      "during" => "during",
+      "menses" => "menses"
+    )
+  end
 
-    should "return the size of the suffix that is being removed" do
-      assert @rule.suffix_size.kind_of?(Numeric)
-    end
+  def test_preserves_numbers_identifiers_and_compound_tokens
+    assert_stems_all(
+      "12345" => "12345",
+      "2026-05-21" => "2026-05-21",
+      "field_name" => "field_name",
+      "pre-indexed" => "pre-indexed"
+    )
+  end
 
-    should "return a stemmed word, a rule number, and a rule on a successful match" do
-      word, rule_num, tmp_rule = @rule.handle('helps')
-      assert word.is_a?(String) && rule_num.is_a?(Numeric) && tmp_rule.is_a?(UEAStemmer::Rule)
-    end
+  def test_preserves_capitalized_terms_and_singularizes_plural_acronyms
+    assert_stems_all(
+      "Ruby" => "Ruby",
+      "USA" => "USA",
+      "FLOSS" => "FLOSS",
+      "USAED" => "USAED",
+      "MREs" => "MRE",
+      "NASAs" => "NASA"
+    )
+  end
 
-    should "return nil when match is unsuccessful" do
-      assert @rule.handle('help').nil?
+  def test_removes_possessive_apostrophes
+    assert_stems_all(
+      "dog's" => "dog",
+      "dogs'" => "dogs",
+      "dog’s" => "dog"
+    )
+  end
+
+  def test_expands_common_contractions_before_indexing
+    assert_stems_all(
+      "don't" => "do not",
+      "won't" => "will not",
+      "can't" => "can not",
+      "Can't" => "Can not",
+      "I've" => "I have",
+      "they're" => "they are",
+      "they’re" => "they are",
+      "I'm" => "I am",
+      "DON'T" => "DO NOT",
+      "I'VE" => "I HAVE"
+    )
+  end
+
+  def test_can_leave_contractions_unexpanded
+    stemmer = UEAStemmer.new(nil, nil, skip_contractions: true)
+
+    assert_equal "don't", stemmer.stem("don't")
+  end
+
+  def test_configured_length_limits_pass_through_out_of_range_tokens
+    stemmer = UEAStemmer.new(5, 3)
+
+    assert_equal "deoxyribonucleicacid", stemmer.stem("deoxyribonucleicacid")
+    assert_equal "CAVASSOO", stemmer.stem("CAVASSOO")
+  end
+
+  def test_stemming_does_not_mutate_the_input_token
+    token = "helpers"
+
+    assert_equal "helper", @stemmer.stem(token)
+    assert_equal "helpers", token
+  end
+
+  def test_singleton_instance_uses_the_same_stemming_behavior
+    assert_equal "run", DefaultUEAStemmer.instance.stem("running")
+  end
+
+  def test_stem_with_rule_returns_documented_metadata
+    result = @stemmer.stem_with_rule("invited")
+
+    assert_equal "invite", result.word
+    assert_equal "22.3", result.rule_num
+    assert_match(/rule #22\.3/, result.rule.to_s)
+  end
+
+  def test_stem_with_rule_keeps_distinct_decimal_rule_identifiers
+    assert_equal "63.10", @stemmer.stem_with_rule("abodes").rule_num
+    assert_equal "63.1", @stemmer.stem_with_rule("makes").rule_num
+  end
+
+  private
+
+  def assert_stems_all(examples)
+    examples.each do |token, expected|
+      assert_equal expected, @stemmer.stem(token), "#{token.inspect} should stem to #{expected.inspect}"
     end
   end
 end

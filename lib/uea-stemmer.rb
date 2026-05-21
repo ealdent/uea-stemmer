@@ -26,41 +26,46 @@ require 'singleton'
 class UEAStemmer
   include StringHelpers
 
-  attr_accessor :max_acronym_length, :max_word_length
-  attr_reader :rules, :options
+  APOSTROPHE_PATTERN = /['’]/
+  PROBLEM_WORDS = %w[is as this has was during menses].freeze
+  SPECIAL_RULE_COUNT = 4
+
+  attr_reader :max_acronym_length, :max_word_length
 
   def initialize(max_word_length = nil, max_acronym_length = nil, options = {})
     @max_word_length = max_word_length || 'deoxyribonucleicacid'.size
     @max_acronym_length = max_acronym_length || 'CAVASSOO'.size
-    @options = options.dup
+    @options = options.transform_keys(&:to_sym).freeze
 
-    @rules = Array.new
+    @rules = []
     create_rules
   end
 
+  def rules
+    @rules.dup.freeze
+  end
+
+  def options
+    @options
+  end
+
   def stem_with_rule(word)
-    stemmed_word = word.dup;
-    ruleno = 0;
+    stemmed_word = word.dup
 
     if problem_word?(word)
       Word.new(word, 94)
     elsif (word.size > @max_acronym_length && word =~ /^[A-Z]+$/) || (word.size > (@max_acronym_length + 1) && word =~ /^[A-Z]+s$/)
-      Word.new(word, 96)      # added by JMA to catch long acronyms
+      Word.new(word, 96)
     elsif word.size > @max_word_length
       Word.new(word, 95)
-    elsif word.index("'")
-      if word =~ /^.*'[s]$/i
+    elsif word =~ APOSTROPHE_PATTERN
+      if word =~ /^.*['’]s$/i
         stemmed_word = remove_suffix(stemmed_word, 2)
-      elsif word =~ /^.*'$/
+      elsif word =~ /^.*['’]$/
         stemmed_word = remove_suffix(stemmed_word, 1)
       end
 
-      unless options[:skip_contractions]
-        stemmed_word.gsub!(/n't/, ' not')
-        stemmed_word.gsub!(/'ve/, ' have')
-        stemmed_word.gsub!(/'re/, ' are')
-        stemmed_word.gsub!(/'m/, ' am')
-      end
+      stemmed_word = expand_contractions(stemmed_word) unless options[:skip_contractions]
 
       Word.new(stemmed_word, 93)
     else
@@ -74,7 +79,7 @@ class UEAStemmer
   end
 
   def num_rules
-    @rules.map { |r| r.rule_num }.uniq.size + 4    # four rules not covered by the rules array
+    @rules.map { |r| r.rule_num }.uniq.size + SPECIAL_RULE_COUNT
   end
 
   def to_s
@@ -82,7 +87,7 @@ class UEAStemmer
   end
 
   def add_rule(rule)
-    if rule.kind_of?(Rule)
+    if rule.is_a?(Rule)
       @rules << rule.dup.freeze
       true
     else
@@ -94,11 +99,46 @@ class UEAStemmer
 
   def apply_rules(word)
     @rules.each do |rule|
-      stemmed_word, rule_num, tmp_rule = rule.handle(word)
-      return [stemmed_word, rule_num, rule] if stemmed_word && rule_num
+      stemmed_word, rule_num, matched_rule = rule.handle(word)
+      return [stemmed_word, rule_num, matched_rule] if stemmed_word && rule_num
     end
 
     [word, 0, nil]
+  end
+
+  def expand_contractions(word)
+    normalized_word = word.tr('’', "'")
+
+    if normalized_word =~ /\Awon't\z/i
+      match_word_case(word, 'will not')
+    elsif normalized_word =~ /\Acan't\z/i
+      match_word_case(word, 'can not')
+    elsif normalized_word =~ /\Ashan't\z/i
+      match_word_case(word, 'shall not')
+    elsif normalized_word =~ /\A(.+)n't\z/i
+      "#{$1}#{match_suffix_case(word, ' not')}"
+    elsif normalized_word =~ /\A(.+)'ve\z/i
+      "#{$1}#{match_suffix_case(word, ' have')}"
+    elsif normalized_word =~ /\A(.+)'re\z/i
+      "#{$1}#{match_suffix_case(word, ' are')}"
+    elsif normalized_word =~ /\A(.+)'m\z/i
+      "#{$1}#{match_suffix_case(word, ' am')}"
+    else
+      word
+    end
+  end
+
+  def match_word_case(original_word, expanded_word)
+    return expanded_word.upcase if original_word == original_word.upcase
+    return expanded_word.sub(/\A[a-z]/) { |letter| letter.upcase } if original_word =~ /\A[A-Z]/
+
+    expanded_word
+  end
+
+  def match_suffix_case(original_word, suffix)
+    return suffix.upcase if original_word == original_word.upcase
+
+    suffix
   end
 
   def create_rules
@@ -117,8 +157,6 @@ class UEAStemmer
     @rules << EndingRule.new('sis', 0, 4)
     @rules << EndingRule.new('tis', 0, 5)
     @rules << EndingRule.new('ss', 0, 6)
-
-    # plural change - this differs from Perl v1.03
     @rules << EndingRule.new('eed', 0, 7)
     @rules << EndingRule.new('eeds', 1, 7)
 
@@ -157,13 +195,9 @@ class UEAStemmer
     @rules << EndingRule.new('eared', 2, 20.3)
     @rules << EndingRule.new('tored', 2, 20.2)
     @rules << EndingRule.new('ered', 2, 20.1)
-
-    # plural change - this differs from Perl v1.03
     @rules << EndingRule.new('red', 1, 20)
     @rules << EndingRule.new('reds', 2, 20)
     @rules << EndingRule.new('tted', 3, 21)
-
-    # added some rules to handle invited vs. exited
     @rules << EndingRule.new('noted', 1, 22.6)
     @rules << EndingRule.new('leted', 1, 22.5)
     @rules << Rule.new(/^.*[^vm]ited$/, 2, 22.4)
@@ -175,8 +209,6 @@ class UEAStemmer
     @rules << EndingRule.new('anges', 1, 23)
     @rules << EndingRule.new('aining', 3, 24)
     @rules << EndingRule.new('acting', 3, 25)
-
-    # plural change - this differs from Perl v1.03
     @rules << EndingRule.new('tting', 4, 26)
     @rules << EndingRule.new('ttings', 5, 26)
 
@@ -184,9 +216,6 @@ class UEAStemmer
     @rules << EndingRule.new('ssed', 2, 28)
     @rules << EndingRule.new('sed', 1, 29)
     @rules << EndingRule.new('titudes', 1, 30)
-
-    # added some additional rules to handle other vowels and consonants
-    # (added by Jason M. Adams)
     @rules << EndingRule.new('oed', 1, 31.3)
     @rules << EndingRule.new('does', 2, 31.2)
     @rules << EndingRule.new('oes', 1, 31.2)
@@ -212,8 +241,6 @@ class UEAStemmer
     @rules << EndingRule.new('ssing', 3, 37)
     @rules << EndingRule.new('ssings', 4, 37)
     @rules << EndingRule.new('ulting', 3, 38)
-
-    # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('ving', 3, 39, 'e')
     @rules << ConcatenatingEndingRule.new('vings', 4, 39, 'e')
 
@@ -231,8 +258,6 @@ class UEAStemmer
     @rules << EndingRule.new('rdings', 4, 40.2)
     @rules << EndingRule.new('nding', 3, 40.1)
     @rules << EndingRule.new('ndings', 4, 40.1)
-
-    # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('ding', 3, 40, 'e')
     @rules << ConcatenatingEndingRule.new('dings', 4, 40, 'e')
 
@@ -255,8 +280,6 @@ class UEAStemmer
     @rules << EndingRule.new('mmings', 5, 44.3)
     @rules << EndingRule.new('rming', 3, 44.2)
     @rules << EndingRule.new('lming', 3, 44.1)
-
-    # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('ming', 3, 44, 'e')
     @rules << ConcatenatingEndingRule.new('mings', 4, 44, 'e')
 
@@ -273,8 +296,6 @@ class UEAStemmer
     @rules << EndingRule.new('oning', 3, 46.2)
     @rules << EndingRule.new('rning', 3, 46.1)
     @rules << ConcatenatingEndingRule.new('ning', 3, 46, 'e')
-
-    # plural change - this differs from Perl v1.03
     @rules << EndingRule.new('sting', 3, 47)
     @rules << EndingRule.new('stings', 4, 47)
     @rules << EndingRule.new('eting', 3, 48.4)
@@ -287,13 +308,9 @@ class UEAStemmer
     @rules << ConcatenatingEndingRule.new('ting', 3, 48, 'e')
     @rules << ConcatenatingEndingRule.new('tings', 4, 48, 'e')
 
-    @rules << EndingRule.new('ssed', 2, 49)
     @rules << EndingRule.new('les', 1, 50)
     @rules << EndingRule.new('tes', 1, 51)
     @rules << EndingRule.new('zed', 1, 52)
-    @rules << EndingRule.new('lled', 2, 53)
-
-    # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('iring', 3, 54.4, 'e')
     @rules << ConcatenatingEndingRule.new('irings', 4, 54.4, 'e')
     @rules << ConcatenatingEndingRule.new('uring', 3, 54.3, 'e')
@@ -302,19 +319,15 @@ class UEAStemmer
     @rules << ConcatenatingEndingRule.new('ncings', 4, 54.2, 'e')
 
     @rules << ConcatenatingEndingRule.new('zing', 3, 54.1, 'e')
-
-    # plural change - this differs from Perl v1.03
     @rules << ConcatenatingEndingRule.new('sing', 3, 54, 'e')
     @rules << ConcatenatingEndingRule.new('sings', 4, 54, 'e')
 
     @rules << EndingRule.new('lling', 3, 55)
     @rules << ConcatenatingEndingRule.new('ied', 3, 56, 'y')
     @rules << ConcatenatingEndingRule.new('ating', 3, 57, 'e')
-
-    # plural change - this differs from Perl v1.03
-    @rules << ConcatenatingEndingRule.new('dying', 4, 58.2, 'ie')   # added by JMA
-    @rules << ExhaustiveConcatenatingEndingRule.new('lying', 4, 58.2, 'ie')   # added by JMA    (lying vs flying)
-    @rules << ConcatenatingEndingRule.new('tying', 4, 58.2, 'ie')   # added by JMA
+    @rules << ConcatenatingEndingRule.new('dying', 4, 58.2, 'ie')
+    @rules << ExhaustiveConcatenatingEndingRule.new('lying', 4, 58.2, 'ie')
+    @rules << ConcatenatingEndingRule.new('tying', 4, 58.2, 'ie')
     @rules << EndingRule.new('thing', 0, 58.1)
     @rules << EndingRule.new('things', 1, 58.1)
     @rules << CustomRule.new(/.*\w\wings?$/, 3, 58)
@@ -325,10 +338,9 @@ class UEAStemmer
     @rules << EndingRule.new('aped', 1, 61.3)
     @rules << EndingRule.new('uded', 1, 61.2)
     @rules << EndingRule.new('oded', 1, 61.1)
-    @rules << EndingRule.new('ated', 1, 61)
     @rules << CustomRule.new(/.*\w\weds?$/, 2, 62)
-    @rules << EndingRule.new('des', 1, 63.10) # Fix for words like grades, escapades, abodes
-    @rules << EndingRule.new('res', 1, 63.9) # Fix for words like fires, acres, wires, cares
+    @rules << EndingRule.new('des', 1, '63.10')
+    @rules << EndingRule.new('res', 1, 63.9)
     @rules << EndingRule.new('pes', 1, 63.8)
     @rules << EndingRule.new('mes', 1, 63.7)
     @rules << EndingRule.new('ones', 1, 63.6)
@@ -351,7 +363,7 @@ class UEAStemmer
   end
 
   def problem_word?(word)
-    ['is', 'as', 'this', 'has', 'was', 'during', 'menses'].include?(word)
+    PROBLEM_WORDS.include?(word)
   end
 
 end

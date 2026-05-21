@@ -29,7 +29,7 @@ class UEAStemmer
     def initialize(pattern, suffix_size, rule_num)
       @pattern = pattern.dup.freeze
       @suffix_size = suffix_size
-      @rule_num = rule_num
+      @rule_num = rule_num.to_s.freeze
     end
 
     def handle(word)
@@ -45,7 +45,7 @@ class UEAStemmer
     attr_reader :original_pattern
 
     def initialize(pattern, suffix_size, rule_num)
-      super(/^.*#{pattern}$/, suffix_size, rule_num)
+      super(/^.*#{Regexp.escape(pattern)}$/, suffix_size, rule_num)
       @original_pattern = pattern.dup.freeze
     end
 

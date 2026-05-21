@@ -1,7 +1,7 @@
 = uea-stemmer
 
 Ruby implementation of the UEA-Lite stemmer for conservative stemming in
-search and indexing workloads.
+search and indexing workloads. The gem has no runtime dependencies.
 
 UEA-Lite[https://web.archive.org/web/20120728132949/http://www.uea.ac.uk/cmp/research/graphicsvisionspeech/speech/WordStemming]
 uses a rule set to normalize suffixes while avoiding aggressive stemming.
@@ -25,6 +25,8 @@ Marie-Claire Jenkins and Dr. Dan J. Smith at the University of East Anglia.
 
 == Installation
 
+Requires Ruby 3.1 or newer.
+
 Install the gem:
 
   gem install uea-stemmer
@@ -33,9 +35,8 @@ Install from source:
 
   git clone https://github.com/ealdent/uea-stemmer.git
   cd uea-stemmer
-  bundle install
-  bundle exec rake test
-  bundle exec rake install
+  gem build uea-stemmer.gemspec
+  gem install ./uea-stemmer-*.gem
 
 == Example Usage
 
@@ -52,7 +53,7 @@ You can extract the matching rule with +stem_with_rule+:
 
   result = stemmer.stem_with_rule("invited")
   result.word      # => "invite"
-  result.rule_num  # => 22.3
+  result.rule_num  # => "22.3"
   result.rule      # => #<UEAStemmer::Rule ...>
 
 Disable contraction expansion:
@@ -64,13 +65,27 @@ Use the singleton instance:
 
   DefaultUEAStemmer.instance.stem("running")  # => "run"
 
+== Development
+
+This project does not require Bundler or Rake for normal development. Run the
+tests directly:
+
+  ruby -Itest test/uea_stemmer_test.rb
+
+Build the gem package:
+
+  gem build uea-stemmer.gemspec
+
+GitHub Actions runs the test suite and gem build on supported Ruby versions.
+
 == Contributing
 
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add or update tests.
-* Run +bundle exec rake test+.
-* Send me a pull request. Bonus points for topic branches.
+* Run +ruby -Itest test/uea_stemmer_test.rb+.
+* Run +gem build uea-stemmer.gemspec+.
+* Send a pull request.
 
 == Relevant Web Pages
 

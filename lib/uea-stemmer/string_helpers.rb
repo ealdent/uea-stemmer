@@ -4,6 +4,6 @@ module StringHelpers
   end
 
   def ends_with?(word, suffix)
-    !!(word =~ /#{suffix}$/)
+    word.end_with?(suffix)
   end
 end

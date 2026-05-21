@@ -8,25 +8,22 @@ Gem::Specification.new do |spec|
   spec.authors = ["Marie-Claire Jenkins", "Dan J. Smith", "Richard Churchill", "Jason Adams"]
   spec.email = ["jasonmadams@gmail.com"]
 
-  summary = "Port of UEA-Lite Stemmer to Ruby, a conservative stemmer for search and indexing."
+  summary = "Conservative UEA-Lite stemming for search and indexing."
   spec.summary = summary
-  spec.description = summary
+  spec.description = "Ruby port of the UEA-Lite stemmer, designed to normalize common English suffixes without aggressive stemming."
   spec.homepage = "https://github.com/ealdent/uea-stemmer"
   spec.license = "Apache-2.0"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.files = Dir.glob("lib/**/*").select { |path| File.file?(path) } +
-    Dir.glob("test/**/*").select { |path| File.file?(path) } +
-    %w[.document LICENSE README.rdoc Rakefile VERSION uea-stemmer.gemspec]
+    %w[LICENSE README.rdoc VERSION]
   spec.require_paths = ["lib"]
 
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/ealdent/uea-stemmer/issues",
     "changelog_uri" => "https://github.com/ealdent/uea-stemmer/releases",
     "homepage_uri" => spec.homepage,
+    "rubygems_mfa_required" => "true",
     "source_code_uri" => spec.homepage
   }
-
-  spec.add_development_dependency "rake", ">= 13.0", "< 14.0"
-  spec.add_development_dependency "shoulda-context", ">= 2.0", "< 3.0"
-  spec.add_development_dependency "test-unit", ">= 3.7", "< 4.0"
 end

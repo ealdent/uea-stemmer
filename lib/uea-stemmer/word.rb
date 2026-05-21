@@ -24,12 +24,12 @@ class UEAStemmer
 
     def initialize(word, rule_num, rule = nil)
       @word = word.dup.freeze
-      @rule_num = rule_num
+      @rule_num = rule_num.to_s.freeze
       @rule = rule
     end
 
     def to_s
-      if @rule_num > 0
+      if @rule_num != '0'
         "#{@word} (Rule ##{@rule_num} #{@rule})"
       else
         "#{@word} (No rule)"
